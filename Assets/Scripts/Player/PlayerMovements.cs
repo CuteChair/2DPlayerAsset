@@ -14,6 +14,10 @@ public class PlayerMovements : MonoBehaviour
 
     //Jump Variables
     private float jumpBufferCounter;
+    private bool isJumping;
+
+    //ApexTime Variables
+    private float apexCounter;
 
     //GroundCheck variables
     [SerializeField] private LayerMask groundLayer;
@@ -36,7 +40,8 @@ public class PlayerMovements : MonoBehaviour
 
     private void Update()
     {
-        jumpBufferCounter -= Time.deltaTime;
+        jumpBufferCounter   -= Time.deltaTime;
+        apexCounter         -= Time.deltaTime;
         GetInputs();
     }
 
@@ -45,20 +50,25 @@ public class PlayerMovements : MonoBehaviour
         Move();
         GroundCheck();
         JumpAction();
+        FallAccelerate();
+        ApplyApexMod();
     }
-    bool jumpHeld => Input.GetKey(KeyCode.Space);
 
-    float moveX => Input.GetAxisRaw("Horizontal");
+    #region Inputs
+    bool jumpHeld   => Input.GetKey(KeyCode.Space);
+
+    float moveX     => Input.GetAxisRaw("Horizontal");
     private void GetInputs()
     {
-        
-
         if(Input.GetKeyDown(KeyCode.Space))
         {
             jumpBufferCounter = p_statsSO.JumpBufferTimer;
         }
     }
-   
+
+    #endregion
+
+    #region Movements
     private void Move()
     {
         float targetSpeed = moveX * p_statsSO.TargetedSpeed;
@@ -71,9 +81,10 @@ public class PlayerMovements : MonoBehaviour
     {
         if (jumpBufferCounter > 0 && isGrounded)
         {
-            p_rb2d.AddForce(Vector2.up * p_statsSO.JumpForce * 1.5f, ForceMode2D.Impulse);
+            p_rb2d.AddForce(Vector2.up * p_statsSO.JumpForce, ForceMode2D.Impulse);
+            isJumping = true;   
         }
-        if (!jumpHeld && !IsFalling() && jumpBufferCounter > 0) 
+        if (!jumpHeld && !IsFalling()) 
         {
             GravityIncrease();
         }
@@ -81,8 +92,43 @@ public class PlayerMovements : MonoBehaviour
         if(isGrounded && jumpBufferCounter < 0 && !IsFalling())
         {
             ResetGravity();
+            isJumping = false;
         }
     }
+    #endregion
+
+    #region Gravity
+
+    private void ApplyApexMod()
+    {
+        if (!isGrounded && isJumping && p_rb2d.velocity.y > -0.5 && p_rb2d.velocity.y < 0.5)
+        {
+            apexCounter = p_statsSO.ApexTimer;
+            p_rb2d.constraints = RigidbodyConstraints2D.FreezePositionY | RigidbodyConstraints2D.FreezeRotation;
+        }
+
+        if (apexCounter <= 0)
+            p_rb2d.constraints = RigidbodyConstraints2D.FreezeRotation;
+    }
+    private bool IsFalling()
+    {
+        return p_rb2d.velocity.y < 0;
+    }
+
+    private void FallAccelerate()
+    {
+        if (!isGrounded && IsFalling())
+            GravityIncrease();
+    }
+    private float GravityIncrease()
+    {
+        if (p_rb2d.gravityScale < 40)
+            return p_rb2d.gravityScale *= p_statsSO.GravityIncrease;
+        else
+            return p_rb2d.gravityScale = 40f;
+    }
+    private float ResetGravity() => p_rb2d.gravityScale = 9.5f;
+    #endregion
     private void GroundCheck()
     {
         Vector2 boxSize = new Vector2(transform.localScale.x * p_statsSO.GcSize.x,
@@ -91,13 +137,6 @@ public class PlayerMovements : MonoBehaviour
         isGrounded = Physics2D.OverlapBox(transform.position + p_statsSO.GcOffset, boxSize, 0f, groundLayer);
     }
 
-    private bool IsFalling()
-    {
-        return p_rb2d.velocity.y < 0;
-    }
-
-    private float GravityIncrease() => p_rb2d.gravityScale *= p_statsSO.GravityIncrease;
-    private float ResetGravity() => p_rb2d.gravityScale = 9.5f;
     private void OnDrawGizmos()
     {
         Vector2 boxSize = new Vector2(transform.localScale.x * p_statsSO.GcSize.x,

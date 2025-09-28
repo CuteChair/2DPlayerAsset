@@ -16,6 +16,7 @@ MonoBehaviour:
   TargetedSpeed: 43.9
   JumpForce: 30.9
   JumpBufferTimer: 0.1
-  GravityIncrease: 1.663
+  ApexTimer: 1
+  GravityIncrease: 1.176
   GcOffset: {x: 0, y: -0.05, z: 0}
   GcSize: {x: 1, y: 1}
