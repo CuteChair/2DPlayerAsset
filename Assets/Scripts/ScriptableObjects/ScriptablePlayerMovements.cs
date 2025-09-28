@@ -7,11 +7,16 @@ using UnityEngine;
 public class ScriptablePlayerMovements : ScriptableObject
 {
     [Header("Running parameters")]
-    [Range(0f, 10f)] public float RunSpeed;
+    [Range(0f, 10f)] public float RunAcceleration;
+    [Range(0f, 100f)] public float TargetedSpeed;
+
 
     [Header("Jump Parameters")]
     [Range(0f, 100f)] public float JumpForce;
     [Range(0f, 1f)] public float JumpBufferTimer;
+
+    [Header("Gravity Parameters")]
+    [Range(1f, 2)] public float GravityIncrease;
 
     [Header("GroundCheck parameters")]
     public Vector3 GcOffset;

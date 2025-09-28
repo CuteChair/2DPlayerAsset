@@ -12,8 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9ee27d158a4a25a4aa9feef87acf0e5d, type: 3}
   m_Name: PlayerMovementStats
   m_EditorClassIdentifier: 
-  RunSpeed: 5.08
-  JumpForce: 8.4
-  JumpBufferTimer: 0.3
+  RunAcceleration: 1.07
+  TargetedSpeed: 43.9
+  JumpForce: 30.9
+  JumpBufferTimer: 0.1
+  GravityIncrease: 1.663
   GcOffset: {x: 0, y: -0.05, z: 0}
   GcSize: {x: 1, y: 1}
