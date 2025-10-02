@@ -9,33 +9,31 @@ public class PlayerMovements : MonoBehaviour
     [SerializeField] private Rigidbody2D p_rb2d;
     [SerializeField] private SpriteRenderer p_sr;
 
-    //Inputs variables
-    //private float moveX;
-
     //Jump Variables
     private float jumpBufferCounter;
     private bool isJumping;
 
     //ApexTime Variables
     private float apexCounter;
+    //private bool isApexEnded;
 
     //GroundCheck variables
     [SerializeField] private LayerMask groundLayer;
     private bool isGrounded;
 
-
+    //Gravity Variables
+    private float defaultGravity;
 
     private void Awake()
     {
-        if(p_rb2d == null)
-        {
-            p_rb2d = GetComponent<Rigidbody2D>();
-        }
-        
-        if(p_sr == null)
-        {
-            p_sr = GetComponent<SpriteRenderer>();
-        }
+
+        if (p_rb2d == null)
+           p_rb2d = GetComponent<Rigidbody2D>();
+
+        if (p_sr == null)
+            p_sr     = p_sr ?? GetComponent<SpriteRenderer>();
+
+           defaultGravity = p_rb2d.gravityScale;
     }
 
     private void Update()
@@ -43,6 +41,9 @@ public class PlayerMovements : MonoBehaviour
         jumpBufferCounter   -= Time.deltaTime;
         apexCounter         -= Time.deltaTime;
         GetInputs();
+        //ApplyApexMod();
+        if (!isGrounded && IsFalling() && !isJumping)
+            AccelerateFall();
     }
 
     private void FixedUpdate()
@@ -50,13 +51,10 @@ public class PlayerMovements : MonoBehaviour
         Move();
         GroundCheck();
         JumpAction();
-        FallAccelerate();
-        ApplyApexMod();
     }
 
     #region Inputs
     bool jumpHeld   => Input.GetKey(KeyCode.Space);
-
     float moveX     => Input.GetAxisRaw("Horizontal");
     private void GetInputs()
     {
@@ -82,12 +80,14 @@ public class PlayerMovements : MonoBehaviour
         if (jumpBufferCounter > 0 && isGrounded)
         {
             p_rb2d.AddForce(Vector2.up * p_statsSO.JumpForce, ForceMode2D.Impulse);
-            isJumping = true;   
+            isJumping = true;
+            print("Jumped");
         }
+
         if (!jumpHeld && !IsFalling()) 
-        {
-            GravityIncrease();
-        }
+           AccelerateFall();
+        if (jumpHeld && IsFalling())
+            AccelerateFall();
 
         if(isGrounded && jumpBufferCounter < 0 && !IsFalling())
         {
@@ -99,35 +99,24 @@ public class PlayerMovements : MonoBehaviour
 
     #region Gravity
 
-    private void ApplyApexMod()
-    {
-        if (!isGrounded && isJumping && p_rb2d.velocity.y > -0.5 && p_rb2d.velocity.y < 0.5)
-        {
-            apexCounter = p_statsSO.ApexTimer;
-            p_rb2d.constraints = RigidbodyConstraints2D.FreezePositionY | RigidbodyConstraints2D.FreezeRotation;
-        }
-
-        if (apexCounter <= 0)
-            p_rb2d.constraints = RigidbodyConstraints2D.FreezeRotation;
-    }
+    //private void ApplyApexMod()
+    //{
+    //    if (isJumping)
+    //    {
+    //        if (Mathf.Abs(p_rb2d.velocity.y) < 0.5f)
+    //            StartCoroutine(ApexModifCoroutine(1f));
+    //    }
+    //}
     private bool IsFalling()
     {
         return p_rb2d.velocity.y < 0;
     }
 
-    private void FallAccelerate()
+    private void AccelerateFall()
     {
-        if (!isGrounded && IsFalling())
-            GravityIncrease();
+            p_rb2d.gravityScale = defaultGravity * p_statsSO.GravityMultiplier;
     }
-    private float GravityIncrease()
-    {
-        if (p_rb2d.gravityScale < 40)
-            return p_rb2d.gravityScale *= p_statsSO.GravityIncrease;
-        else
-            return p_rb2d.gravityScale = 40f;
-    }
-    private float ResetGravity() => p_rb2d.gravityScale = 9.5f;
+    private float ResetGravity() => p_rb2d.gravityScale = defaultGravity;
     #endregion
     private void GroundCheck()
     {
@@ -137,6 +126,15 @@ public class PlayerMovements : MonoBehaviour
         isGrounded = Physics2D.OverlapBox(transform.position + p_statsSO.GcOffset, boxSize, 0f, groundLayer);
     }
 
+
+    //private IEnumerator ApexModifCoroutine(float wait)
+    //{
+    //    p_rb2d.constraints = RigidbodyConstraints2D.FreezePositionY | RigidbodyConstraints2D.FreezeRotation;
+
+    //    yield return new WaitForSeconds(wait);
+
+    //    p_rb2d.constraints = RigidbodyConstraints2D.FreezeRotation;
+    //}
     private void OnDrawGizmos()
     {
         Vector2 boxSize = new Vector2(transform.localScale.x * p_statsSO.GcSize.x,

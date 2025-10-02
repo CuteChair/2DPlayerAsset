@@ -19,7 +19,7 @@ public class ScriptablePlayerMovements : ScriptableObject
     [Range(0f, 1f)] public float ApexTimer;
 
     [Header("Gravity Parameters")]
-    [Range(1f, 2)] public float GravityIncrease;
+    [Range(1f, 4f)] public float GravityMultiplier;
 
     [Header("GroundCheck parameters")]
     public Vector3 GcOffset;
