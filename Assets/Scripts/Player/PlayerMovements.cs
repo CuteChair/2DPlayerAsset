@@ -23,7 +23,7 @@ public class PlayerMovements : MonoBehaviour
 
     //PogoJump Variables
     private bool canPogoJump;
-    private bool isOverridingJump;
+    private bool isPogoJumpQueued;
 
     //Gravity Variables
     private float defaultGravity;
@@ -55,8 +55,8 @@ public class PlayerMovements : MonoBehaviour
     {
         Move();
         GroundCheck();
-        JumpAction();
         PogoCheck();
+        JumpAction();
     }
 
     #region Inputs
@@ -64,14 +64,14 @@ public class PlayerMovements : MonoBehaviour
     float moveX     => Input.GetAxisRaw("Horizontal");
     private void GetInputs()
     {
-        if(Input.GetKeyDown(KeyCode.Space) && IsFalling() && canPogoJump)
-        {
-            isOverridingJump = true;
-        }
-        else if(Input.GetKeyDown(KeyCode.Space))
-        {
+         if(Input.GetKeyDown(KeyCode.Space))
+           {
+            if (!isGrounded && IsFalling() && canPogoJump)
+            {
+                isPogoJumpQueued = true;
+            }
             jumpBufferCounter = p_statsSO.JumpBufferTimer;
-        }
+           }
     }
 
     #endregion
@@ -87,34 +87,38 @@ public class PlayerMovements : MonoBehaviour
 
     private void JumpAction()
     {
-        if (isOverridingJump && isGrounded)
-        {
-            jumpBufferCounter = 0;
-            p_rb2d.AddForce(Vector2.up * p_statsSO.JumpForce, ForceMode2D.Impulse);
-            isJumping = true;
-            isOverridingJump = false;
-            print("Pogo Jump");
+        bool jumpbuffered = jumpBufferCounter > 0;
 
-        }
-        else if (jumpBufferCounter > 0 && isGrounded)
+        if (!isPogoJumpQueued)
         {
-            jumpBufferCounter = 0;
-            p_rb2d.AddForce(Vector2.up * p_statsSO.JumpForce, ForceMode2D.Impulse);
-            isJumping = true;
-            print("Normal Jump");
+            if (jumpbuffered && isGrounded)
+            {
+                PerformJump();
+            }
+        }else if (isPogoJumpQueued && isGrounded)
+        {
+            PerformJump();
         }
 
-        if (!jumpHeld && !IsFalling()) 
-           AccelerateFall();
+        if (!jumpHeld && !IsFalling())
+            AccelerateFall();
         if (jumpHeld && IsFalling())
             AccelerateFall();
 
-        if(isGrounded && jumpBufferCounter < 0 && !IsFalling())
+        if (isGrounded && jumpBufferCounter < 0 && !IsFalling())
         {
             ResetGravity();
             isJumping = false;
             isApexApplied = false;
         }
+    }
+
+    private void PerformJump()
+    {
+        jumpBufferCounter = 0;
+        p_rb2d.AddForce(Vector2.up * p_statsSO.JumpForce, ForceMode2D.Impulse);
+        isJumping = true;
+        isPogoJumpQueued = false;
     }
     #endregion
 
@@ -131,6 +135,7 @@ public class PlayerMovements : MonoBehaviour
                 }
         }
     }
+
     private bool IsFalling()
     {
         return p_rb2d.velocity.y < 0;
