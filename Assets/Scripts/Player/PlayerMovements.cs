@@ -9,17 +9,13 @@ public class PlayerMovements : MonoBehaviour
     [SerializeField] private Rigidbody2D p_rb2d;
     [SerializeField] private SpriteRenderer p_sr;
 
-    //Debug
-    [SerializeField] private GameObject debugPoint;
-    private int debugUsed;
-
     //Jump Variables
     private float jumpBufferCounter;
     [SerializeField]private bool isJumping;
 
     //ApexTime Variables
     private float apexCounter;
-    //private bool isApexEnded;
+    private bool  isApexApplied;
 
     //GroundCheck variables
     [SerializeField] private LayerMask groundLayer;
@@ -100,7 +96,7 @@ public class PlayerMovements : MonoBehaviour
         {
             ResetGravity();
             isJumping = false;
-            debugUsed = 0;
+            isApexApplied = false;
         }
     }
     #endregion
@@ -111,13 +107,11 @@ public class PlayerMovements : MonoBehaviour
     {
         if (isJumping)
         {
-                if (Mathf.Abs(p_rb2d.velocity.y) < 2f && debugUsed == 0)
+                if (Mathf.Abs(p_rb2d.velocity.y) < 2f && !isApexApplied)
                 {
-                    Instantiate(debugPoint, transform.position, transform.rotation);
-                    debugUsed = 1;
+                    StartCoroutine(ApexModifCoroutine(p_statsSO.ApexAirTime));
+                    isApexApplied = true;
                 }
-             
-               //StartCoroutine(ApexModifCoroutine(1f));
         }
     }
     private bool IsFalling()
@@ -140,14 +134,14 @@ public class PlayerMovements : MonoBehaviour
     }
 
 
-    //private IEnumerator ApexModifCoroutine(float wait)
-    //{
-    //    p_rb2d.constraints = RigidbodyConstraints2D.FreezePositionY | RigidbodyConstraints2D.FreezeRotation;
+    private IEnumerator ApexModifCoroutine(float wait)
+    {
+        p_rb2d.constraints = RigidbodyConstraints2D.FreezePositionY | RigidbodyConstraints2D.FreezeRotation;
 
-    //    yield return new WaitForSeconds(wait);
+        yield return new WaitForSeconds(wait);
 
-    //    p_rb2d.constraints = RigidbodyConstraints2D.FreezeRotation;
-    //}
+        p_rb2d.constraints = RigidbodyConstraints2D.FreezeRotation;
+    }
     private void OnDrawGizmos()
     {
         Vector2 boxSize = new Vector2(transform.localScale.x * p_statsSO.GcSize.x,

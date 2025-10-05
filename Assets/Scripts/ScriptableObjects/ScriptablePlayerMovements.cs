@@ -16,7 +16,7 @@ public class ScriptablePlayerMovements : ScriptableObject
     [Range(0f, 1f)] public float JumpBufferTimer;
 
     [Header("Apex Parameters")]
-    [Range(0f, 1f)] public float ApexTimer;
+    [Range(0f, 1f)] public float ApexAirTime;
 
     [Header("Gravity Parameters")]
     [Range(1f, 4f)] public float GravityMultiplier;
