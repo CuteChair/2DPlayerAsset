@@ -21,6 +21,10 @@ public class PlayerMovements : MonoBehaviour
     [SerializeField] private LayerMask groundLayer;
     private bool isGrounded;
 
+    //PogoJump Variables
+    private bool canPogoJump;
+    private bool isOverridingJump;
+
     //Gravity Variables
     private float defaultGravity;
 
@@ -42,7 +46,6 @@ public class PlayerMovements : MonoBehaviour
         apexCounter         -= Time.deltaTime;
 
         GetInputs();
-        //ApplyApexMod();
         ApplyApexMod();
         if (!isGrounded && IsFalling() && !isJumping)
             AccelerateFall();
@@ -53,6 +56,7 @@ public class PlayerMovements : MonoBehaviour
         Move();
         GroundCheck();
         JumpAction();
+        PogoCheck();
     }
 
     #region Inputs
@@ -60,7 +64,11 @@ public class PlayerMovements : MonoBehaviour
     float moveX     => Input.GetAxisRaw("Horizontal");
     private void GetInputs()
     {
-        if(Input.GetKeyDown(KeyCode.Space))
+        if(Input.GetKeyDown(KeyCode.Space) && IsFalling() && canPogoJump)
+        {
+            isOverridingJump = true;
+        }
+        else if(Input.GetKeyDown(KeyCode.Space))
         {
             jumpBufferCounter = p_statsSO.JumpBufferTimer;
         }
@@ -79,12 +87,21 @@ public class PlayerMovements : MonoBehaviour
 
     private void JumpAction()
     {
-        if (jumpBufferCounter > 0 && isGrounded)
+        if (isOverridingJump && isGrounded)
         {
             jumpBufferCounter = 0;
             p_rb2d.AddForce(Vector2.up * p_statsSO.JumpForce, ForceMode2D.Impulse);
             isJumping = true;
-            //print("Jumped");
+            isOverridingJump = false;
+            print("Pogo Jump");
+
+        }
+        else if (jumpBufferCounter > 0 && isGrounded)
+        {
+            jumpBufferCounter = 0;
+            p_rb2d.AddForce(Vector2.up * p_statsSO.JumpForce, ForceMode2D.Impulse);
+            isJumping = true;
+            print("Normal Jump");
         }
 
         if (!jumpHeld && !IsFalling()) 
@@ -133,6 +150,11 @@ public class PlayerMovements : MonoBehaviour
         isGrounded = Physics2D.OverlapBox(transform.position + p_statsSO.GcOffset, boxSize, 0f, groundLayer);
     }
 
+    private void PogoCheck()
+    {
+        canPogoJump = Physics2D.Raycast(transform.position, Vector2.down, p_statsSO.PogoRaySize, groundLayer);
+    }
+
 
     private IEnumerator ApexModifCoroutine(float wait)
     {
@@ -150,5 +172,10 @@ public class PlayerMovements : MonoBehaviour
         Gizmos.color = isGrounded ? Color.green : Color.red;
 
         Gizmos.DrawWireCube(transform.position + p_statsSO.GcOffset, boxSize);
+
+        Gizmos.color = canPogoJump ? Color.blue : Color.yellow;
+
+        Gizmos.DrawRay(transform.position, Vector2.down * p_statsSO.PogoRaySize);
+            
     }
 }

@@ -15,6 +15,9 @@ public class ScriptablePlayerMovements : ScriptableObject
     [Range(0f, 100f)] public float JumpForce;
     [Range(0f, 1f)] public float JumpBufferTimer;
 
+    [Header("Pogo Jump Parameters")]
+    [Range(0f, 10f)] public float PogoRaySize;
+
     [Header("Apex Parameters")]
     [Range(0f, 1f)] public float ApexAirTime;
 
