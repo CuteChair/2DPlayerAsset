@@ -732,6 +732,7 @@ MonoBehaviour:
   p_statsSO: {fileID: 11400000, guid: a1a0371416f1b464c96247aa596339f4, type: 2}
   p_rb2d: {fileID: 0}
   p_sr: {fileID: 0}
+  debugPoint: {fileID: 8365495433828700401, guid: b52bd01abc6c06c43bb79e6ad7da9cf4, type: 3}
   groundLayer:
     serializedVersion: 2
     m_Bits: 8

@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   RunAcceleration: 1.07
   TargetedSpeed: 43.9
-  JumpForce: 30.9
+  JumpForce: 43
   JumpBufferTimer: 0.1
   ApexTimer: 1
   GravityMultiplier: 2

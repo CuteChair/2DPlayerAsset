@@ -9,9 +9,13 @@ public class PlayerMovements : MonoBehaviour
     [SerializeField] private Rigidbody2D p_rb2d;
     [SerializeField] private SpriteRenderer p_sr;
 
+    //Debug
+    [SerializeField] private GameObject debugPoint;
+    private int debugUsed;
+
     //Jump Variables
     private float jumpBufferCounter;
-    private bool isJumping;
+    [SerializeField]private bool isJumping;
 
     //ApexTime Variables
     private float apexCounter;
@@ -40,8 +44,10 @@ public class PlayerMovements : MonoBehaviour
     {
         jumpBufferCounter   -= Time.deltaTime;
         apexCounter         -= Time.deltaTime;
+
         GetInputs();
         //ApplyApexMod();
+        ApplyApexMod();
         if (!isGrounded && IsFalling() && !isJumping)
             AccelerateFall();
     }
@@ -79,9 +85,10 @@ public class PlayerMovements : MonoBehaviour
     {
         if (jumpBufferCounter > 0 && isGrounded)
         {
+            jumpBufferCounter = 0;
             p_rb2d.AddForce(Vector2.up * p_statsSO.JumpForce, ForceMode2D.Impulse);
             isJumping = true;
-            print("Jumped");
+            //print("Jumped");
         }
 
         if (!jumpHeld && !IsFalling()) 
@@ -93,20 +100,26 @@ public class PlayerMovements : MonoBehaviour
         {
             ResetGravity();
             isJumping = false;
+            debugUsed = 0;
         }
     }
     #endregion
 
     #region Gravity
 
-    //private void ApplyApexMod()
-    //{
-    //    if (isJumping)
-    //    {
-    //        if (Mathf.Abs(p_rb2d.velocity.y) < 0.5f)
-    //            StartCoroutine(ApexModifCoroutine(1f));
-    //    }
-    //}
+    private void ApplyApexMod()
+    {
+        if (isJumping)
+        {
+                if (Mathf.Abs(p_rb2d.velocity.y) < 2f && debugUsed == 0)
+                {
+                    Instantiate(debugPoint, transform.position, transform.rotation);
+                    debugUsed = 1;
+                }
+             
+               //StartCoroutine(ApexModifCoroutine(1f));
+        }
+    }
     private bool IsFalling()
     {
         return p_rb2d.velocity.y < 0;
