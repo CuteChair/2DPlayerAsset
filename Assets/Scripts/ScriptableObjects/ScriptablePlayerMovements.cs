@@ -10,9 +10,9 @@ public class ScriptablePlayerMovements : ScriptableObject
     [Range(0f, 10f)] public float RunAcceleration;
     [Range(0f, 100f)] public float TargetedSpeed;
 
-
     [Header("Jump Parameters")]
     [Range(0f, 100f)] public float JumpForce;
+    [Range(10f, 15f)] public float LowJumpMultiplier;
     [Range(0f, 1f)] public float JumpBufferTimer;
 
     [Header("Pogo Jump Parameters")]
@@ -20,6 +20,9 @@ public class ScriptablePlayerMovements : ScriptableObject
 
     [Header("Apex Parameters")]
     [Range(0f, 1f)] public float ApexAirTime;
+
+    [Header("Coyote Jump Parameters")]
+    [Range(0f, 1f)] public float CoyoteTimer;
 
     [Header("Gravity Parameters")]
     [Range(1f, 4f)] public float GravityMultiplier;
