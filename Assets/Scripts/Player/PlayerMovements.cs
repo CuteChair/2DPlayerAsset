@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class PlayerMovements : MonoBehaviour
 {
@@ -14,7 +15,6 @@ public class PlayerMovements : MonoBehaviour
     [SerializeField]private bool isJumping;
 
     //ApexTime Variables
-    private float apexCounter;
     private bool  isApexApplied;
 
     //PogoJump Variables
@@ -47,7 +47,6 @@ public class PlayerMovements : MonoBehaviour
     private void Update()
     {
         jumpBufferCounter   -= Time.deltaTime;
-        apexCounter         -= Time.deltaTime;
         coyoteCounter       -= Time.deltaTime;
 
         GetInputs();
@@ -88,6 +87,7 @@ public class PlayerMovements : MonoBehaviour
         float newX = Mathf.MoveTowards(p_rb2d.velocity.x, targetSpeed, p_statsSO.RunAcceleration);
 
         p_rb2d.velocity = new Vector2(newX, p_rb2d.velocity.y);
+        FlipSprite();
     }
 
     private void JumpAction()
@@ -118,6 +118,21 @@ public class PlayerMovements : MonoBehaviour
         p_rb2d.AddForce(Vector2.up * p_statsSO.JumpForce, ForceMode2D.Impulse);
         isJumping = true;
         isPogoJumpQueued = false;
+    }
+
+    private void FlipSprite()
+    {
+        bool isLookingRight = moveX > 0;
+        bool isMoving       = moveX < 0 || moveX > 0;
+
+        if (isLookingRight && isMoving)
+        {
+            p_sr.flipX = false;
+        }
+        else if (!isLookingRight && isMoving)
+        {
+            p_sr.flipX = true;
+        }
     }
     #endregion
 

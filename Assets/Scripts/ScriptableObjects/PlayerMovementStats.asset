@@ -14,10 +14,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   RunAcceleration: 1.07
   TargetedSpeed: 43.9
-  JumpForce: 49.7
+  JumpForce: 49.2
+  LowJumpMultiplier: 13.4
   JumpBufferTimer: 0.1
-  PogoRaySize: 7.02
-  ApexAirTime: 0.035
+  PogoRaySize: 1.31
+  ApexAirTime: 0.265
+  CoyoteTimer: 0.15
   GravityMultiplier: 2
-  GcOffset: {x: 0, y: -0.05, z: 0}
-  GcSize: {x: 1, y: 1}
+  GcOffset: {x: 0.04, y: 0.19, z: 0}
+  GcSize: {x: 0.63, y: 0.54}
