@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -5,6 +6,11 @@ using UnityEngine.Events;
 
 public class PlayerMovements : MonoBehaviour
 {
+    public static event Action OnJumpEvent;
+    public static event Action OnRunEvent;
+    public static event Action OnFallEvent;
+    public static event Action OnIdleEvent;
+
     [Header("References")]
     [SerializeField] private ScriptablePlayerMovements p_statsSO;
     [SerializeField] private Rigidbody2D p_rb2d;
@@ -32,6 +38,9 @@ public class PlayerMovements : MonoBehaviour
     //Gravity Variables
     private float defaultGravity;
 
+    //Event variable
+    private int currentState;
+    private int previousState;
     private void Awake()
     {
 
@@ -48,7 +57,8 @@ public class PlayerMovements : MonoBehaviour
     {
         jumpBufferCounter   -= Time.deltaTime;
         coyoteCounter       -= Time.deltaTime;
-
+        CheckForIdle();
+        CheckForRun();
         GetInputs();
         ApplyApexMod();
         Handlegravity();
@@ -60,6 +70,38 @@ public class PlayerMovements : MonoBehaviour
         GroundCheck();
         PogoCheck();
         JumpAction();
+    }
+
+    private void ChangeState(int newState)
+    {
+        currentState = newState;
+        if (previousState != currentState)
+        {
+            switch (newState)
+            {
+                case 0:
+                    OnIdleEvent?.Invoke();
+                    print("Idle event called");
+                    previousState = currentState;
+                    break;
+                case 1:
+                    OnRunEvent?.Invoke();
+                    print("Run event called");
+                    previousState = currentState;
+                    break;
+                case 2:
+                    OnJumpEvent?.Invoke();
+                    print("Jump event called");
+                    previousState = currentState;
+                    break;
+                case 3:
+                    OnFallEvent?.Invoke();
+                    print("Fall event called");
+                    previousState = currentState;
+                    break;
+            }
+                
+        }
     }
 
     #region Inputs
@@ -118,6 +160,7 @@ public class PlayerMovements : MonoBehaviour
         p_rb2d.AddForce(Vector2.up * p_statsSO.JumpForce, ForceMode2D.Impulse);
         isJumping = true;
         isPogoJumpQueued = false;
+        ChangeState(2); //2 is for jump state
     }
 
     private void FlipSprite()
@@ -132,6 +175,25 @@ public class PlayerMovements : MonoBehaviour
         else if (!isLookingRight && isMoving)
         {
             p_sr.flipX = true;
+        }
+    }
+
+    private void CheckForIdle()
+    {
+        if (isGrounded && !isJumping) { 
+            if(moveX > -0.1f && moveX < 0.1f)
+            {
+                ChangeState(0); // 0 is for idle state
+            }
+        }
+    }
+
+    private void CheckForRun()
+    {
+        if (isGrounded) 
+        {
+            if (moveX > 0f || moveX < 0)
+                ChangeState(1); // 1 is for run state
         }
     }
     #endregion
@@ -165,6 +227,7 @@ public class PlayerMovements : MonoBehaviour
         if (IsFalling() && !isGrounded)
         {
             p_rb2d.gravityScale = defaultGravity * p_statsSO.GravityMultiplier;
+            ChangeState(3); //3 is for fall state
         }
         else
             p_rb2d.gravityScale = defaultGravity;
