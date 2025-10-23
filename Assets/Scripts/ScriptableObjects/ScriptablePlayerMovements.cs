@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(menuName = "Scriptable Object", fileName = "Data/Player", order = 1)]
+[CreateAssetMenu(fileName = "PlayerLogicData", menuName = "ScriptableObjects/PlayerLogicData")]
 public class ScriptablePlayerMovements : ScriptableObject
 {
     [Header("Running parameters")]

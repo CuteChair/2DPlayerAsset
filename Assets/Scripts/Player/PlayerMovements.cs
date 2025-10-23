@@ -81,22 +81,22 @@ public class PlayerMovements : MonoBehaviour
             {
                 case 0:
                     OnIdleEvent?.Invoke();
-                    print("Idle event called");
+                    //print("Idle event called");
                     previousState = currentState;
                     break;
                 case 1:
                     OnRunEvent?.Invoke();
-                    print("Run event called");
+                    //print("Run event called");
                     previousState = currentState;
                     break;
                 case 2:
                     OnJumpEvent?.Invoke();
-                    print("Jump event called");
+                    //print("Jump event called");
                     previousState = currentState;
                     break;
                 case 3:
                     OnFallEvent?.Invoke();
-                    print("Fall event called");
+                    //print("Fall event called");
                     previousState = currentState;
                     break;
             }
