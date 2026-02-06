@@ -4,7 +4,7 @@ using UnityEngine;
 
 [CreateAssetMenu(fileName = "Data", menuName = "ScriptableObjects/SlimeBossData", order = 2)]
 
-public class ScriptableBossStats : MonoBehaviour
+public class ScriptableBossStats : ScriptableObject
 {
     [Header("Health Parameters")]
     [Tooltip("Maximum amout of health")]

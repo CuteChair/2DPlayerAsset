@@ -1,22 +1,36 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
-
-[RequireComponent(typeof(ScriptableSlimeLogicData), typeof(Rigidbody2D))]
+using Random = UnityEngine.Random;
 public class SlimeBossController : MonoBehaviour
 {
+    public static event Action<Vector3> OnSlimeSmash;
+
     [Header("Required Components")]
     [SerializeField] private ScriptableSlimeLogicData slimeLogicData;
     [SerializeField] private Transform targetPlayer;
     [SerializeField] private Rigidbody2D rb2D;
     [SerializeField] private SpriteRenderer spriteR;
     [SerializeField] private LayerMask interactableLayers;
+    [SerializeField] private Animator slimeAnimator;
     private Vector2 targetedPlayerPosition => targetPlayer.transform.position;
+
+    public float stompTimer;
+
+    [SerializeField]
+    private float disableGroundCheckTimer;
 
     private bool isLookingRight;
 
     private bool isGrounded;
+
+    private bool isCharging;
+
+    private bool isFalling => rb2D.velocity.y < 0.01f;
+
+    private Coroutine atkRoutine;
 
     private void Awake()
     {
@@ -31,18 +45,37 @@ public class SlimeBossController : MonoBehaviour
         {
             spriteR = GetComponent<SpriteRenderer>();          
         }
+        if(slimeAnimator == null)
+        {
+            slimeAnimator = GetComponent<Animator>();
+        }
 
     }
 
     private void Update()
     {
-        SlimeHitBox();
-        if (Input.GetKeyDown(KeyCode.F) && isGrounded)
+        stompTimer -= Time.deltaTime;
+        disableGroundCheckTimer -= Time.deltaTime;
+
+        if (stompTimer <= 0 && RandomAttack() == 5)
         {
-            rb2D.velocity = new Vector2(CalculateHorizontalMotion(), CalculateVerticalMotion());
+            isCharging = true;
+            stompTimer = slimeLogicData.AtkCooldown;
+        }
+
+        slimeAnimator.SetBool("isCharging", isCharging);
+
+        if (isCharging && atkRoutine == null)
+        {
+            atkRoutine = StartCoroutine(AtkCycle(2f));
         }
 
         CorrectSlimeSprite();
+    }
+
+    private void FixedUpdate()
+    {
+        SlimeHitBox();
     }
 
     #region Maths velocity
@@ -84,9 +117,15 @@ public class SlimeBossController : MonoBehaviour
         RaycastHit2D hit = Physics2D.BoxCast(transform.position, slimeLogicData.BoxCastSize, 0f, Vector2.down, 0f, interactableLayers);
         if(hit.collider != null)
         {
-            if (hit.collider.gameObject.layer == LayerMask.NameToLayer("Ground"))
+            if (disableGroundCheckTimer <= 0)
             {
-                isGrounded = true;
+                if (hit.collider.gameObject.layer == LayerMask.NameToLayer("Ground") && isFalling && !isGrounded)
+                {
+                    print("Slime hit the floor");
+                    isGrounded = true;
+
+                    OnSlimeSmash?.Invoke(transform.position);
+                }
             }
             if (hit.collider.gameObject.layer == LayerMask.NameToLayer("Player"))
             {
@@ -95,8 +134,29 @@ public class SlimeBossController : MonoBehaviour
         }
         
     }
-    #endregion
 
+    private void ResetGroundedState()
+    {
+        disableGroundCheckTimer = slimeLogicData.DisablingGroundCheckTimer;
+        print(disableGroundCheckTimer);
+        isGrounded = false;
+    }
+    #endregion
+    private int RandomAttack()
+    {
+        int randomInt = Random.Range(1, 1000);
+
+        return randomInt;
+    }
+   private IEnumerator AtkCycle(float waitTime)
+    {
+        yield return new WaitForSeconds(waitTime);
+        isCharging = false;
+        ResetGroundedState();
+        rb2D.velocity = new Vector2(CalculateHorizontalMotion(), CalculateVerticalMotion());
+
+        atkRoutine = null;
+    }
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.yellow;

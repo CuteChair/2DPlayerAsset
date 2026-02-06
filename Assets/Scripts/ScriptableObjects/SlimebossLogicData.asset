@@ -12,5 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fc9c2e6bfbd137748b2790b2b6fa6ef1, type: 3}
   m_Name: SlimebossLogicData
   m_EditorClassIdentifier: 
-  FirstAirTime: 0
+  FirstAirTime: 1
+  AtkCooldown: 5
   BoxCastSize: {x: 6.8, y: 4}
+  DisablingGroundCheckTimer: 0.2
