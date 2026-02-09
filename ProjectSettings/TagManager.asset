@@ -13,7 +13,7 @@ TagManager:
   - UI
   - Player
   - Boss
-  - 
+  - Projectiles
   - 
   - 
   - 
@@ -46,6 +46,9 @@ TagManager:
     locked: 0
   - name: Player
     uniqueID: 3185944423
+    locked: 0
+  - name: Projectile
+    uniqueID: 249520369
     locked: 0
   - name: Boss
     uniqueID: 4166259859
