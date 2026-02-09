@@ -6,7 +6,7 @@ using UnityEngine;
 using Random = UnityEngine.Random;
 public class SlimeBossController : MonoBehaviour
 {
-    public static event Action<Vector3> OnSlimeSmash;
+    public static event Action OnSlimeSmash;
 
     [Header("Required Components")]
     [SerializeField] private ScriptableSlimeLogicData slimeLogicData;
@@ -124,7 +124,7 @@ public class SlimeBossController : MonoBehaviour
                     print("Slime hit the floor");
                     isGrounded = true;
 
-                    OnSlimeSmash?.Invoke(transform.position);
+                    OnSlimeSmash?.Invoke();
                 }
             }
             if (hit.collider.gameObject.layer == LayerMask.NameToLayer("Player"))

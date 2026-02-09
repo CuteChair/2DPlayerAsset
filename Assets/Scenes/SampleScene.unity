@@ -3623,6 +3623,7 @@ GameObject:
   - component: {fileID: 1614822076}
   - component: {fileID: 1614822075}
   - component: {fileID: 1614822079}
+  - component: {fileID: 1614822080}
   m_Layer: 7
   m_Name: SlimeBossSlimeBoss_0
   m_TagString: Untagged
@@ -3812,6 +3813,20 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &1614822080
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1614822073}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b6f1f0b3f79c5648b8203375dd1d75a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  projectileCount: 5
+  projectilePrefab: {fileID: 0}
 --- !u!1 &1821049617
 GameObject:
   m_ObjectHideFlags: 0
